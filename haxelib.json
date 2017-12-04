@@ -1,0 +1,12 @@
+{
+    "name": "Vue.hx",
+    "url" : "https://github.com/DenkiYagi/vuehx",
+    "license": "Apache",
+    "tags": ["javascript", "vue", "vuejs", "vue.js"],
+    "description": "Haxe extern for Vue.js.",
+    "version": "0.1.0-alpha.1",
+    "classPath": "src/",
+    "releasenote": "Initial release.",
+    "contributors": ["terurou"],
+    "dependencies": { }
+  }
