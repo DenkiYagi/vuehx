@@ -8,5 +8,8 @@
     "classPath": "src/",
     "releasenote": "Initial release.",
     "contributors": ["terurou"],
-    "dependencies": { }
+    "dependencies": {
+      "externtype": "git:https://github.com/DenkiYagi/haxe-extern-type.git",
+      "hxgnd": "git:https://github.com/DenkiYagi/hxgnd.git"
+    }
   }

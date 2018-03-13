@@ -10,14 +10,15 @@ import haxe.macro.Context;
 import haxe.macro.Compiler;
 import haxe.macro.Type;
 import haxe.macro.Expr;
-import hxgnd.ArrayTools;
-import hxgnd.Optional;
+import hxgnd.Maybe;
 import haxe.Http;
+
+using hxgnd.ArrayTools;
 #end
 
 class VueComponentMacro {
     #if macro
-    static var cssPath: Optional<String>;
+    static var cssPath: Maybe<String>;
 
     public static macro function build(): Array<Field> {
         var orignalFields = Context.getBuildFields();
@@ -27,25 +28,25 @@ class VueComponentMacro {
         var compileResult = getVueFilePath(cls).map(compile);
 
         // generate fields
-        var options = ArrayTools.first(orignalFields, function (f) return f.name == "_");
+        var options = orignalFields.head(function (f) return f.name == "_");
         var datatype = options.flatMap(
             function (f) {
                 return switch (f.kind) {
                     case FVar(_, {expr: EObjectDecl(optFlds), pos: p}):
-                        ArrayTools.first(optFlds, function(o) return o.field == "data").flatMap(function (df) {
+                        optFlds.head(function(o) return o.field == "data").flatMap(function (df) {
                             return switch (Context.toComplexType(Context.typeof(df.expr))) {
-                                case TFunction(_, ret): Optional.of(ret);
-                                default: Optional.empty();
+                                case TFunction(_, ret): Maybe.of(ret);
+                                default: Maybe.empty();
                             }
                         });
                     default:
-                        Optional.empty();
+                        Maybe.empty();
                 };
             }
-        ).getOr(macro :Dynamic);
+        ).getOrElse(macro :Dynamic);
 
         var fields = [];
-        fields = fields.concat(options.matchReturn(
+        fields = fields.concat(options.match(
             function (f) {
                 // オリジナルの _ は残す。残さないと入力補完が利かなくなる。
                 // _ を残してもコンパイルオプションで -dce full を指定している場合は、jsには残らない。
@@ -140,7 +141,7 @@ class VueComponentMacro {
         // TODO .css出力先は、vuehx外部ライブラリ化した際、extraParams.hxml によって起動時に算出するように変更する
         // TODO Context.onAfterGenerate() で書き込むように変更する
         Context.onAfterGenerate(function () {
-            compileResult.foreach(function (x) {
+            compileResult.forEach(function (x) {
                 var file: FileOutput;
                 try {
                     if (cssPath.isEmpty()) {
@@ -165,18 +166,18 @@ class VueComponentMacro {
         return macro untyped __js__($v{js});
     }
 
-    static function getVueFilePath(cls: ClassType): Optional<String> {
+    static function getVueFilePath(cls: ClassType): Maybe<String> {
         var path = ~/.hx$/u.replace(Context.getPosInfos(cls.pos).file, ".vue");
         return if (FileSystem.exists(path)) {
             path;
         } else {
-            Optional.empty();
+            Maybe.empty();
         }
     }
 
     static function makeOptionsField(datatype: ComplexType, origFields: Array<{field: String, expr: Expr}>, 
-            compileResult: Optional<CompiledResult>, pos: Position): Field {
-        var fields = compileResult.matchReturn(function (cr) {
+            compileResult: Maybe<CompiledResult>, pos: Position): Field {
+        var fields = compileResult.match(function (cr) {
             var newFields = origFields.filter(function (f) {
                 return f.field != "beforeCreate"
                     && f.field != "render"
@@ -192,7 +193,7 @@ class VueComponentMacro {
 
             newFields.push({ 
                 field: "beforeCreate", 
-                expr: ArrayTools.first(origFields, function(o) return o.field == "beforeCreate").matchReturn(
+                expr: origFields.head(function(o) return o.field == "beforeCreate").match(
                     function (x) {
                         return macro [ ${x.expr}, ${beforeCreate} ];
                     },
@@ -254,9 +255,7 @@ class VueComponentMacro {
             }
             process = null;
             
-            var error = "can not start compiler-service:\n" + detail.join("\n");
-            Context.fatalError(error, Context.currentPos());
-            throw error;
+            Context.fatalError("can not start compiler-service:\n" + detail.join("\n"), Context.currentPos());
         }
     }
 
@@ -266,7 +265,6 @@ class VueComponentMacro {
         var http = new Http("http://localhost:54301/compile?file=" + path);
         http.onError = function (err) {
             Context.fatalError(err, Context.currentPos());
-            throw err;
         }
         http.request();
         

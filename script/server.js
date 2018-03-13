@@ -86,7 +86,7 @@ function start(port, expire, options) {
         } else {
             res.send({
                 status: "error",
-                message: "bad request"
+                message: "bad request : not found " + src
             });
         }
     }

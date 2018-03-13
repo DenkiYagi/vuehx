@@ -2,7 +2,7 @@ package vuehx;
 
 import vuehx.Vue;
 import js.Promise;
-import hxgnd.extern.Mixed2;
+import externtype.Mixed2;
 
 abstract Component(Dynamic)
     from Class<Vue<Dynamic>>

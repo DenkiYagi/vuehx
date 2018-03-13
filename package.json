@@ -16,8 +16,5 @@
     "postcss-modules": "^1.1.0",
     "source-map": "^0.6.1",
     "vue-template-compiler": "^2.5.3"
-  },
-  "devDependencies": {
-    "browser-sync": "^2.18.13"
   }
 }

@@ -4,10 +4,10 @@ import js.Promise;
 import js.html.Element;
 import haxe.Constraints.Function;
 import haxe.extern.Rest;
-import hxgnd.extern.Mixed2;
-import hxgnd.extern.Mixed3;
-import hxgnd.extern.ValueOrArray;
-import hxgnd.extern.ValueOrFunction;
+import externtype.Mixed2;
+import externtype.Mixed3;
+import externtype.ValueOrArray;
+import externtype.ValueOrFunction;
 import vuehx.VueRouter;
 
 @:native("Vue")

@@ -1,0 +1,7 @@
+-cp src
+-cp test
+-lib hxgnd
+-lib externtype
+-main Test
+-js build/test.js
+-D js-es5
