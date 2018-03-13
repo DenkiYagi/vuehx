@@ -2,17 +2,22 @@ package;
 
 class Run {
     public static function main() {
-        var args = Sys.args();
-        if (args.length == 1) {
-            switch (args[0]) {
-                case "setup":
-                    setupWithNpm();
-                case "setup-yarn":
-                    setupWithYarn();
-                case _:
-            }
+        switch (readCommand()) {
+            case "setup":
+                setupWithNpm();
+            case "setup-yarn":
+                setupWithYarn();
+            case _:
+                printUsage();
         }
-        printUsage();
+    }
+
+    static function readCommand(): Null<String> {
+        var args = Sys.args();
+        if (args.length <= 0) return null;
+        if (args.length == 1) return args[0];
+        if (args.length == 4 && args[0] == "haxelib") return args[3];
+        return null;
     }
 
     static function printUsage() {
