@@ -13,11 +13,9 @@ class Run {
     }
 
     static function readCommand(): Null<String> {
+        // When called by haxelib, args is [<command>, <dir>]
         var args = Sys.args();
-        if (args.length <= 0) return null;
-        if (args.length == 1) return args[0];
-        if (args.length == 4 && args[0] == "haxelib") return args[3];
-        return null;
+        return args[0];
     }
 
     static function printUsage() {
