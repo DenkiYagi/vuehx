@@ -19,6 +19,7 @@ using hxgnd.ArrayTools;
 class VueComponentMacro {
     #if macro
     static var cssPath: Maybe<String>;
+    static var process: Process;
 
     public static macro function build(): Array<Field> {
         var orignalFields = Context.getBuildFields();
@@ -234,14 +235,30 @@ class VueComponentMacro {
 
     // TODO optimizeSSR https://github.com/vuejs/vue-loader/blob/master/lib/template-compiler/index.js#L31
 
-    static var process: Process;
-
     // TODO node.exe起動タイミングをマクロ起動時に変更する = server側のexpire不要
-    static function startServer() {
+    static function compile(path: String): CompiledResult {
+        startCompilerServer();
+
+        var http = new Http("http://localhost:54301/compile?file=" + path);
+        http.onError = function (err) {
+            Context.fatalError(err, Context.currentPos());
+        }
+        http.request();
+
+        var response = Json.parse(http.responseData);
+        if (response.status == "success") {
+            return response.message;
+        } else {
+            throw response.message;
+        }
+    }
+
+    static function startCompilerServer() {
         if (process != null) return;
 
         // NOTE 通常ビルド時はビルド完了とともにプロセスがクローズされる。入力補完の場合は、起動しっぱなしになる。
-        process = new Process("node ./script/server.js --css-camelcase");
+        var serverPath = findCompilerServerPath();
+        process = new Process('node ${serverPath} --css-camelcase');
         try {
             process.stdout.readLine();
         } catch (e: haxe.io.Eof) {
@@ -258,21 +275,25 @@ class VueComponentMacro {
         }
     }
 
-    static function compile(path: String): CompiledResult {
-        startServer();
+    static function findCompilerServerPath(): String {
+        var path = "script/server.js";
+        if (FileSystem.exists(path)) return path;
 
-        var http = new Http("http://localhost:54301/compile?file=" + path);
-        http.onError = function (err) {
-            Context.fatalError(err, Context.currentPos());
+        var process = new Process("haxelib path vuehx");
+        try {
+            while (true) {
+                var line = process.stdout.readLine();
+                var path = line + "../script/server.js";
+                if (FileSystem.exists(path)) {
+                    process.close();
+                    return path;
+                }
+            }
+        } catch (e: haxe.io.Eof) {
+            process.close();
         }
-        http.request();
 
-        var response = Json.parse(http.responseData);
-        if (response.status == "success") {
-            return response.message;
-        } else {
-            throw response.message;
-        }
+        return Context.fatalError("can not find compiler-service", Context.currentPos());
     }
     #end
 }
