@@ -1,20 +1,19 @@
 {
-  "name": "vue-macro",
+  "name": "vuehx",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
-  "license": "ISC",
-  "dependencies": {
-    "commander": "^2.11.0",
-    "express": "^4.16.1",
+  "author": "terurou",
+  "license": "Apache",
+  "devDependencies": {
+    "commander": "^2.15.0",
+    "express": "^4.16.3",
     "is-running": "^2.1.0",
-    "postcss": "^6.0.14",
+    "postcss": "^6.0.19",
     "postcss-modules": "^1.1.0",
     "source-map": "^0.6.1",
-    "vue-template-compiler": "^2.5.3"
+    "vue-template-compiler": "^2.5.15"
   }
 }
