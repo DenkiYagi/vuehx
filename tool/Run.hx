@@ -3,8 +3,6 @@ package;
 class Run {
     public static function main() {
         var args = Sys.args();
-var dependencies = getDependencies();
-trace(dependencies);
         if (args.length == 1) {
             switch (args[0]) {
                 case "setup":
@@ -36,10 +34,7 @@ trace(dependencies);
 
     static function getDependencies() {
         var jsonPath = ~/run.n$/.replace(Sys.programPath(), "package.json");
-        trace(jsonPath);
         var content = sys.io.File.getContent(jsonPath);
-        trace(content);
-
         var dependencies: Dynamic<String> = haxe.Json.parse(content).devDependencies;
 
         var result = [];
