@@ -94,13 +94,13 @@ class VueComponentMacro {
         //     access: [Access.APrivate, Access.AStatic, Access.AInline],
         //     pos: cls.pos,
         //     kind: FieldType.FFun({
-        //         args: [], 
+        //         args: [],
         //         ret: ComplexType.TPath({
         //             pack: ["vuehx"],
         //             name: "Vue",
         //             params: [ TypeParam.TPType(datatype) ]
         //         }),
-        //         params: null, 
+        //         params: null,
         //         expr: macro return js.Lib.nativeThis
         //     })
         // });
@@ -114,9 +114,9 @@ class VueComponentMacro {
                         access: [Access.APrivate, Access.AStatic, Access.AInline],
                         pos: cls.pos,
                         kind: FieldType.FFun({
-                            args: [], 
+                            args: [],
                             ret: t,
-                            params: null, 
+                            params: null,
                             expr: macro return untyped __js__($v{"this['$" + f.name + "']"})
                         })
                     });
@@ -125,9 +125,9 @@ class VueComponentMacro {
                         access: [Access.APrivate, Access.AStatic, Access.AInline],
                         pos: cls.pos,
                         kind: FieldType.FFun({
-                            args: [{name: "value", type: t}], 
+                            args: [{name: "value", type: t}],
                             ret: macro :Void,
-                            params: null, 
+                            params: null,
                             expr: macro Reflect.setField(js.Lib.nativeThis, $v{"$" + f.name}, value)
                         })
                     });
@@ -139,7 +139,6 @@ class VueComponentMacro {
 
         // export css file
         // TODO .css出力先は、vuehx外部ライブラリ化した際、extraParams.hxml によって起動時に算出するように変更する
-        // TODO Context.onAfterGenerate() で書き込むように変更する
         Context.onAfterGenerate(function () {
             compileResult.forEach(function (x) {
                 var file: FileOutput;
@@ -161,8 +160,8 @@ class VueComponentMacro {
 
         return fields;
     }
-    
-    static function makeJsExpr(js: String): Expr {        
+
+    static function makeJsExpr(js: String): Expr {
         return macro untyped __js__($v{js});
     }
 
@@ -175,7 +174,7 @@ class VueComponentMacro {
         }
     }
 
-    static function makeOptionsField(datatype: ComplexType, origFields: Array<{field: String, expr: Expr}>, 
+    static function makeOptionsField(datatype: ComplexType, origFields: Array<{field: String, expr: Expr}>,
             compileResult: Maybe<CompiledResult>, pos: Position): Field {
         var fields = compileResult.match(function (cr) {
             var newFields = origFields.filter(function (f) {
@@ -191,8 +190,8 @@ class VueComponentMacro {
                 })}
             };
 
-            newFields.push({ 
-                field: "beforeCreate", 
+            newFields.push({
+                field: "beforeCreate",
                 expr: origFields.head(function(o) return o.field == "beforeCreate").match(
                     function (x) {
                         return macro [ ${x.expr}, ${beforeCreate} ];
@@ -203,15 +202,15 @@ class VueComponentMacro {
                 )
             });
 
-            newFields.push({ 
-                field: "render", 
+            newFields.push({
+                field: "render",
                 expr: ${makeJsExpr(cr.template.render)}
             });
             newFields.push({
                 field: "staticRenderFns",
                 expr: macro [$a{cr.template.staticRenderFns.map(makeJsExpr)}]
             });
-            
+
             return newFields;
         }, function () {
             return origFields;
@@ -227,7 +226,7 @@ class VueComponentMacro {
                     name: "Vue",
                     sub: "ComponentOptions",
                     params: [ TypeParam.TPType(datatype) ]
-                }), 
+                }),
                 //macro :vuehx.Vue.ComponentOptions<Dynamic>,
                 {expr: EObjectDecl(fields), pos: pos})
         };
@@ -236,7 +235,7 @@ class VueComponentMacro {
     // TODO optimizeSSR https://github.com/vuejs/vue-loader/blob/master/lib/template-compiler/index.js#L31
 
     static var process: Process;
-    
+
     // TODO node.exe起動タイミングをマクロ起動時に変更する = server側のexpire不要
     static function startServer() {
         if (process != null) return;
@@ -254,7 +253,7 @@ class VueComponentMacro {
             } catch (_: haxe.io.Eof) {
             }
             process = null;
-            
+
             Context.fatalError("can not start compiler-service:\n" + detail.join("\n"), Context.currentPos());
         }
     }
@@ -267,14 +266,14 @@ class VueComponentMacro {
             Context.fatalError(err, Context.currentPos());
         }
         http.request();
-        
+
         var response = Json.parse(http.responseData);
         if (response.status == "success") {
             return response.message;
         } else {
             throw response.message;
         }
-    }    
+    }
     #end
 }
 
@@ -286,7 +285,7 @@ typedef CompiledResult = {
         staticRenderFns: Array<String>,
     },
     style: {
-        content: String, 
+        content: String,
         classNames: Dynamic<Dynamic<String>>
     }
 };
