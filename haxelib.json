@@ -9,7 +9,7 @@
     "releasenote": "Initial release.",
     "contributors": ["terurou"],
     "dependencies": {
-      "externtype": "git:https://github.com/DenkiYagi/haxe-extern-type.git",
-      "hxgnd": "git:https://github.com/DenkiYagi/hxgnd.git"
+      "externtype": "git:git@github.com:DenkiYagi/haxe-extern-type.git",
+      "hxgnd": "git:git@github.com:DenkiYagi/hxgnd.git"
     }
   }
