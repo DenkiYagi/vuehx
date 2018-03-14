@@ -13,7 +13,7 @@ import vuehx.VueRouter;
 @:native("Vue")
 extern class Vue<TData> implements Dynamic {
     function new(options: VueOptions<TData>);
-    
+
     // public properties
     /**
      * @see https://vuejs.org/v2/api/#vm-data
@@ -63,8 +63,8 @@ extern class Vue<TData> implements Dynamic {
     /**
      * @see https://vuejs.org/v2/api/#vm-refs
      */
-    @:native("$refs") var refs(default, never): Dynamic<Mixed3<Vue<Dynamic>, Element, Array<Mixed2<Vue<Dynamic>, Element>>>>;
-    
+    @:native("$refs") var refs(default, never): Dynamic<ValueOrArray<Mixed2<Vue<Dynamic>, Element>>>;
+
     /**
      * @see https://vuejs.org/v2/api/#vm-isServer
      */
@@ -79,7 +79,7 @@ extern class Vue<TData> implements Dynamic {
      * @see https://vuejs.org/v2/api/#vm-listeners
      */
     @:native("$listeners") var listeners(default, never): Dynamic<ValueOrArray<Function>>;
-    
+
     // public methods
     //@:native("$createElement") function createElement(tag: Mixed2<String, ComponentOptions>, ?data: {}, ?children: Array<Mixed2<String, VNode>>): VNode;
 
@@ -87,13 +87,13 @@ extern class Vue<TData> implements Dynamic {
      * @see https://vuejs.org/v2/api/#vm-watch
      */
     @:overload(function(fn: Void -> String, callback: WatchCallback, ?options: WatchOptions): Unwatch {})
-    @:native("$watch") function watch(exp: String, callback: WatchCallback, ?options: WatchOptions): Unwatch; 
-    
+    @:native("$watch") function watch(exp: String, callback: WatchCallback, ?options: WatchOptions): Unwatch;
+
     /**
      * @see https://vuejs.org/v2/api/#vm-set
      */
     @:overload(function<T>(target: Array<T>, key: Int, value: T): T {})
-    @:native("$set") function set<T>(target: {}, key: String, value: T): T; 
+    @:native("$set") function set<T>(target: {}, key: String, value: T): T;
 
     /**
      * @see https://vuejs.org/v2/api/#vm-delete
@@ -140,11 +140,11 @@ extern class Vue<TData> implements Dynamic {
      * @see https://vuejs.org/v2/api/#vm-nextTick
      */
     @:native("$nextTick") function nextTick(fn: Void -> Void): Promise<Void>;
-    
+
     /**
      * @see https://vuejs.org/v2/api/#vm-destroy
      */
-    @:native("$destroy") function destroy(): Void; 
+    @:native("$destroy") function destroy(): Void;
 
     // css modules
     /**
@@ -207,7 +207,7 @@ extern class Vue<TData> implements Dynamic {
     static function component(id: String): Class<Vue<Dynamic>>;
 
     /**
-     * @see https://vuejs.org/v2/api/#Vue-use 
+     * @see https://vuejs.org/v2/api/#Vue-use
      **/
     static function use(plugin: Dynamic, ?options: Dynamic): Void;
 
@@ -228,7 +228,7 @@ extern class Vue<TData> implements Dynamic {
 }
 
 typedef VueOptions<TData> = {
-    > ComponentOptions<TData>, 
+    > ComponentOptions<TData>,
     @:optional var router: VueRouter;
 }
 
@@ -274,7 +274,7 @@ typedef ComponentOptions<TData> = {
      * @see https://vuejs.org/v2/api/#template
      */
     @:optional var template: String;
-    
+
     /**
      * @see https://vuejs.org/v2/api/#render
      */
@@ -355,7 +355,7 @@ typedef ComponentOptions<TData> = {
      * @see https://vuejs.org/v2/guide/components.html
      */
     @:optional var components: Dynamic<Component>;
-    
+
     // transitions?: { [key: string]: Object };
 
     // composition
@@ -363,7 +363,7 @@ typedef ComponentOptions<TData> = {
      * @see https://vuejs.org/v2/api/#parent
      */
     @:optional var parent: Vue<Dynamic>;
-    
+
     /**
      * @see https://vuejs.org/v2/api/#mixins
      * @see https://vuejs.org/v2/guide/mixins.html
@@ -378,7 +378,7 @@ typedef ComponentOptions<TData> = {
     // Maybe it works on Haxe 4. https://github.com/HaxeFoundation/haxe/issues/5105
     @:native("extends") @:optional var extend: Mixed2<ComponentOptions<Dynamic>, Class<Vue>>;
     #end
-    
+
     /**
      * @see https://vuejs.org/v2/api/#provide-inject
      */
@@ -408,7 +408,7 @@ typedef ComponentOptions<TData> = {
     /**
      * @see https://vuejs.org/v2/api/#model
      */
-    @:optional var model: { 
+    @:optional var model: {
         @:optional var prop: String;
         @:optional var event: String;
     }
@@ -472,7 +472,7 @@ typedef DirectiveOptions = {
     @:optional function inserted(el: Element, binding: DirectiveBinding, vnode: VNode, oldVnode: VNode): Void;
     @:optional function update(el: Element, binding: DirectiveBinding, vnode: VNode, oldVnode: VNode): Void;
     @:optional function componentUpdated(el: Element, binding: DirectiveBinding, vnode: VNode, oldVnode: VNode): Void;
-    @:optional function unbind(el: Element, binding: DirectiveBinding, vnode: VNode, oldVnode: VNode): Void;    
+    @:optional function unbind(el: Element, binding: DirectiveBinding, vnode: VNode, oldVnode: VNode): Void;
 }
 
 typedef DirectiveBinding = {
@@ -500,7 +500,28 @@ typedef WatchCallback = Any -> Any -> Void;
 
 typedef WatchOptions = {
     @:optional var deep: Bool;
-    @:optional var immediate: Bool;    
+    @:optional var immediate: Bool;
 }
 
 typedef Unwatch = Void -> Void;
+
+class VueHelper {
+    public static macro function vue() {
+        var cls = Context.getLocalClass().get();
+        for (s in cls.statics.get()) {
+            if (s.name != "options") continue;
+
+            switch (s.type) {
+                case TType(_, params):
+                    var T = Context.toComplexType(params[0]);
+                    return macro {
+                        var vue: vuehx.Vue<$T> = js.Lib.nativeThis;
+                        vue;
+                    }
+                case _:
+                    break;
+            }
+        }
+        return macro null;
+    }
+}
