@@ -36,43 +36,61 @@ const compiler = require('vue-template-compiler');
 const postcss = require('postcss');
 const sourcemap = require('source-map');
 
+// TODO LRU Cache
+const cache = new Map();
+
+// TODO optionsはコンストラクタで渡す。基本不変なのと、下手に可変するとコンパイルキャッシュの都合が悪い
 function compile(src, options = {}) {
-    const parts = compiler.parseComponent(fs.readFileSync(src, 'utf-8'), { pad: 'line' });
+    const stat = fs.statSync(src);
 
-    if (parts.styles.some(function (x) { return x.scoped; })) {
-        // TODO WARN: scoped css <style scoped> はサポートしない
+    const c = cache.get(src);
+    if (c && c.mtimeMs === stat.mtimeMs) {
+        return Promise.resolve(c.data);
+    } else {
+        const parts = compiler.parseComponent(fs.readFileSync(src, 'utf-8'), { pad: 'line' });
+
+        if (parts.styles.some(function (x) { return x.scoped; })) {
+            // TODO WARN: scoped css <style scoped> はサポートしない
+        }
+
+        return Promise.all([processTemplate(parts.template)]
+                .concat(parts.styles.map(function (x, i) { return  processStyle(x, i, src, options)})))
+            .then(function (results) {
+                var template = results[0];
+                var styles = results.slice(1);
+
+                var data = {
+                    template: template,
+                    style: {
+                        content: styles.map(x => x.css).join('\n'),
+                        classNames: Object.assign({}, ...styles.map(x => x.classNames))
+                    }
+                };
+
+                cache.set(src, {
+                    mtimeMs: stat.mtimeMs,
+                    data: data
+                });
+
+                return data;
+            })
+            .catch(function (err) {
+                console.log(err);
+            })
     }
-
-    return Promise.all([processTemplate(parts.template)]
-            .concat(parts.styles.map(function (x, i) { return  processStyle(x, i, src, options)})))
-        .then(function (results) {
-            var template = results[0];
-            var styles = results.slice(1);
-
-            return {
-                template: template,
-                style: {
-                    content: styles.map(x => x.css).join('\n'),
-                    classNames: Object.assign({}, ...styles.map(x => x.classNames))
-                }
-            };
-        })
-        .catch(function (err) {
-            console.log(err);
-        })
 }
 
 function processTemplate(part) {
     function toFunction(code) {
         return "Function('" + code.replace(/['"\\]/g, "\\$&") + "')";
     }
-    
+
     // TODO part.lang=pug をプリコンパイルする
 
     return getContent(part).then(function (content) {
         var compiled = compiler.compile(content);
         // console.log(compiled);
-        
+
         // TODO エラーハンドリング
         return {
             render: toFunction(compiled.render),
@@ -84,7 +102,7 @@ function processTemplate(part) {
 function processStyle(part, index, src, options) {
     let plugins = [];
     let classNames = {};
-    
+
     let moduleName = (part.module === true) ? 'style' : part.module;
     if (moduleName) {
         plugins.push(require('postcss-modules')({
@@ -104,7 +122,7 @@ function processStyle(part, index, src, options) {
             }
         }));
     }
-    
+
     // TODO postcss.plugins.js をロードできるようにする
     // module.exports = () => [
     //     { 'postcss-plugin': { opt: true } }
@@ -119,7 +137,7 @@ function processStyle(part, index, src, options) {
                 });
 
                 var consumer = new sourcemap.SourceMapConsumer(result.map.toString());
-                consumer.eachMapping(function (m) { 
+                consumer.eachMapping(function (m) {
                     generator.addMapping({
                         source: resolvePath(src),
                         name: m.name,
