@@ -1,5 +1,6 @@
 package vuehx;
 
+import vuehx.Vue;
 import externtype.Mixed2;
 import externtype.Mixed3;
 import externtype.Mixed4;
@@ -20,31 +21,31 @@ extern class VueRouter {
     var currentRoute(default, never): Route;
 
     function beforeEach(guard: NavigationGuard): Function;
-    
+
     function beforeResolve(guard: NavigationGuard): Function;
-    
+
     function afterEach(guard: NavigationGuard): Function;
-    
+
     function push(location: RawLocation, ?onComplete: Void -> Void, ?onAbort: Void -> Void): Void;
-    
+
     function replace(location: RawLocation, ?onComplete: Void -> Void, ?onAbort: Void -> Void): Void;
-    
+
     function go(n: Int): Void;
-    
+
     function back(): Void;
-    
+
     function forward(): Void;
-    
+
     @:overload(function(to: RawLocation): Array<Vue<Dynamic>> {})
     @:overload(function(to: Route): Array<Vue<Dynamic>> {})
     function getMatchedComponents(): Array<Vue<Dynamic>>;
-    
+
     function resolve(to: RawLocation, ?current: Route, ?append: Bool): { location: Location, route: Route, href: String };
-    
+
     function addRoutes(routes: Array<RouteConfig>): Void;
-    
+
     function onReady(callback: Void -> Void, ?errorCallback: Dynamic -> Void): Void;
-    
+
     function onError(callback: Dynamic -> Void): Void;
 }
 

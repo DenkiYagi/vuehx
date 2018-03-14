@@ -456,6 +456,44 @@ typedef PropOptions = Mixed2<
     }
 >
 
+abstract PropType(Function) {
+    public static var String(get, never): PropType;
+    public static var Number(get, never): PropType;
+    public static var Boolean(get, never): PropType;
+    public static var Function(get, never): PropType;
+    public static var Object(get, never): PropType;
+    public static var Array(get, never): PropType;
+    public static var Symbol(get, never): PropType;
+
+    inline static function get_String(): PropType {
+        return untyped __js__("String");
+    }
+
+    inline static function get_Number(): PropType {
+        return untyped __js__("Number");
+    }
+
+    inline static function get_Boolean(): PropType {
+        return untyped __js__("Boolean");
+    }
+
+    inline static function get_Function(): PropType {
+        return untyped __js__("Function");
+    }
+
+    inline static function get_Object(): PropType {
+        return untyped __js__("Object");
+    }
+
+    inline static function get_Array(): PropType {
+        return untyped __js__("Array");
+    }
+
+    inline static function get_Symbol(): PropType {
+        return untyped __js__("Symbol");
+    }
+}
+
 typedef ComputedOptions = {
     @:optional var get: Void -> Dynamic;
     @:optional var set: Dynamic -> Void;
@@ -504,3 +542,28 @@ typedef WatchOptions = {
 }
 
 typedef Unwatch = Void -> Void;
+
+@:autoBuild(vuehx.macro.VueComponentMacro.build())
+interface IVueComponent {
+}
+
+abstract Component(Dynamic)
+    from Class<Vue<Dynamic>>
+    from ComponentOptions<Dynamic>
+    from (Mixed2<Class<Vue<Dynamic>>, ComponentOptions<Dynamic>> -> Void) -> (Dynamic -> Void) -> Void
+    from Promise<Mixed2<Class<Vue<Dynamic>>, ComponentOptions<Dynamic>>>
+    from AsyncComponentOptions
+{
+    inline function new(x: Dynamic) {
+        this = x;
+    }
+
+    @:from
+    public static function fromVueHxComponent(x: VueHxComponent) {
+        return new Component(x.options);
+    }
+}
+
+typedef VueHxComponent = {
+    var options: ComponentOptions<Dynamic>;
+}
