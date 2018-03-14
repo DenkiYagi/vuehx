@@ -169,7 +169,7 @@ class VueComponentMacro {
     static function getVueFilePath(cls: ClassType): Maybe<String> {
         var path = ~/.hx$/u.replace(Context.getPosInfos(cls.pos).file, ".vue");
         return if (FileSystem.exists(path)) {
-            path;
+            FileSystem.absolutePath(path);
         } else {
             Maybe.empty();
         }
