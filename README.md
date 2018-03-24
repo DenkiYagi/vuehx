@@ -20,7 +20,7 @@ WIP
 2. Install vuehx.
 
     ```
-    haxelib git vuehx
+    haxelib git vuehx https://github.com/DenkiYagi/vuehx.git
     ```
 
     If you don't want to install vuehx to global, you can use `haxelib newrepo`.
