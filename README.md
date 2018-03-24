@@ -2,6 +2,12 @@
 Haxe extern for Vue.js.
 This product is alpha version.
 
+## Motivation
+* I want to develop the Vue.js application with Haxe/JS.
+* But I don't like Webpack.
+* So, I have to make a Vue.js extern that is not dependent on Webpack...
+* And this extern must be able to parse the Vue.js template at compile-time.
+
 ## Requirements
 * Haxe 3.4.x
 * Node.js v8+
@@ -14,6 +20,7 @@ WIP
 
     ```
     mkdir MyProject
+
     cd MyProject
     ```
 
