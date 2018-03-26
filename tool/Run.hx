@@ -63,7 +63,8 @@ class Run {
     static function copy(srcDir: String, distDir: String): Void {
         if (!FileSystem.isDirectory(srcDir)) throw '${srcDir} is not directory';
         if (!FileSystem.isDirectory(distDir)) throw '${distDir} is not directory';
-        if (FileSystem.readDirectory(distDir).length > 0) throw '${distDir} is not empty directory';
+        if (FileSystem.readDirectory(distDir).filter(function (x) return x != ".haxelib").length > 0)
+            throw '${distDir} is not empty directory';
 
         var stack = [];
         stack.push("");
