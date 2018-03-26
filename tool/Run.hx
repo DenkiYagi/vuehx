@@ -46,9 +46,9 @@ class Run {
 
         Sys.setCwd(projectDir);
         if (yarnEnabled) {
-            Sys.command('npm i -D ${getDependencies()}');
-        } else {
             Sys.command('yarn add -D ${getDependencies()}');
+        } else {
+            Sys.command('npm i -D ${getDependencies()}');
         }
     }
 
