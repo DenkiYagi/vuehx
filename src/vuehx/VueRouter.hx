@@ -58,7 +58,7 @@ typedef VueRouterOptions = {
     /**
      * @see https://router.vuejs.org/en/api/options.html#mode
      */
-    @:optional var mode: String;
+    @:optional var mode: RouterMode;
 
     /**
      * @see https://router.vuejs.org/en/api/options.html#base
@@ -108,6 +108,12 @@ typedef RouteConfig = {
     @:optional var meta: Dynamic;
     @:optional var caseSensitive: Bool;
     @:optional var pathToRegexpOptions: PathToRegexpOptions; // 正規表現のコンパイルとして path-to-regexp オプション
+}
+
+@:enum abstract RouterMode(String) {
+    var Hash = "hash";
+    var History = "history";
+    var Abstract = "abstract";
 }
 
 typedef Location = {
