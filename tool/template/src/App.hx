@@ -2,8 +2,8 @@ package;
 
 import vuehx.Vue;
 
-class Main {
-    public static function main(): Void {
-
+class App implements IVueComponent {
+    var _ = {
+        name: "App"
     }
 }

@@ -1,0 +1,4 @@
+-cp src
+-lib vuehx
+-main Main
+-js dist/app.js
