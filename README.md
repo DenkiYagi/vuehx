@@ -14,8 +14,6 @@ This product is alpha version.
 * npm or yarn
 
 ## Creating a new vue.hx project
-WIP
-
 1. Create a project directory:
 
     ```
@@ -42,19 +40,9 @@ WIP
     haxelib run vuehx setup-yarn
     ```
 
-4. ...
-
 ## Updating vue.hx
 ```
 haxelib update
-haxelib run vuehx setup
-```
-
-If you are using yarn, run this:
-
-```
-haxelib update
-haxelib run vuehx setup-yarn
 ```
 
 
