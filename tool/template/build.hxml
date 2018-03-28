@@ -2,3 +2,8 @@
 -lib vuehx
 -main Main
 -js dist/app.js
+-D js-es5
+# -D js-source-map
+# -D source-map-content
+# -dce full
+# -D analyzer-optimize
