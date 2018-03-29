@@ -1,11 +1,13 @@
 package vuehx;
 
+import js.Error;
 import js.Promise;
 import js.html.Element;
 import haxe.Constraints.Function;
 import haxe.extern.Rest;
 import externtype.Mixed2;
 import externtype.Mixed3;
+import externtype.Mixed4;
 import externtype.ValueOrArray;
 import externtype.ValueOrFunction;
 import vuehx.VueRouter;
@@ -242,7 +244,10 @@ typedef ComponentOptions<TData> = {
     /**
      * @see https://vuejs.org/v2/api/#props
      */
-    @:optional var props: Mixed2<Array<String>, Dynamic<Mixed3<PropType, Array<PropType>, PropOptions>>>;
+    @:optional var props: Mixed2<
+        Array<String>,
+        Dynamic<Mixed2<ValueOrArray<PropType>, PropOptions>>
+    >;
 
     /**
      * @see https://vuejs.org/v2/api/#propsData
@@ -268,7 +273,7 @@ typedef ComponentOptions<TData> = {
     /**
      * @see https://vuejs.org/v2/api/#el
      */
-    @:optional var el: Mixed2<String, js.html.Element>;
+    @:optional var el: Mixed2<String, Element>;
 
     /**
      * @see https://vuejs.org/v2/api/#template
@@ -283,7 +288,7 @@ typedef ComponentOptions<TData> = {
     /**
      * @see https://vuejs.org/v2/api/#renderError
      */
-    @:optional var renderError: CreateElement -> js.Error -> VNode;
+    @:optional var renderError: CreateElement -> Error -> VNode;
     @:optional var staticRenderFns: Array<Void -> VNode>;
 
     // lifecycle
@@ -370,14 +375,11 @@ typedef ComponentOptions<TData> = {
      */
     @:optional var mixins: Array<ComponentOptions<Dynamic>>;
 
-    // TODO マクロでextendをextendsに変換
-    /**
-     * @see https://vuejs.org/v2/api/#extends
-     */
-    #if (haxe_ver >= 4.0)
-    // Maybe it works on Haxe 4. https://github.com/HaxeFoundation/haxe/issues/5105
-    @:native("extends") @:optional var extend: Mixed2<ComponentOptions<Dynamic>, Class<Vue>>;
-    #end
+    // TODO Maybe it works on Haxe 4. https://github.com/HaxeFoundation/haxe/issues/5105
+    // /**
+    //  * @see https://vuejs.org/v2/api/#extends
+    //  */
+    // @:native("extends") @:optional var extend: Mixed2<ComponentOptions<Dynamic>, Class<Vue>>;
 
     /**
      * @see https://vuejs.org/v2/api/#provide-inject
@@ -432,29 +434,44 @@ typedef AsyncComponentOptions = {
     @:optional var timeout: Int;
 }
 
-// NOTE Haxe3.4.4: typeをValueOrArray<T>で記述するとコンパイルが通らないので、仕方なくこの定義方法にしている
-typedef PropOptions = Mixed2<
-    {
-        @:optional var type: PropType;
-        //TODO マクロでextendをextendsに変換
-        #if (haxe_ver >= 4.0)
-        // Maybe it works on Haxe 4. https://github.com/HaxeFoundation/haxe/issues/5105
-        @:native("default") @:optional var defaultValue: Dynamic;
-        #end
-        @:optional var required: Bool;
-        @:optional var validator: Dynamic -> Bool;
-    },
-    {
-        @:optional var type: Array<PropType>;
-        // TODO マクロでextendをextendsに変換
-        #if (haxe_ver >= 4.0)
-        // Maybe it works on Haxe 4. https://github.com/HaxeFoundation/haxe/issues/5105
-        @:native("default") @:optional var defaultValue: Dynamic;
-        #end
-        @:optional var required: Bool;
-        @:optional var validator: Dynamic -> Bool;
+// Maybe it works on Haxe 4. https://github.com/HaxeFoundation/haxe/issues/5105
+#if (haxe_ver >= 4.0)
+typedef PropOptions = {
+    @:optional var type: ValueOrArray<PropType>;
+    @:optional var required: Bool;
+    @:optional var validator: Dynamic -> Bool;
+    @:native("default") @:optional var defaultValue: Dynamic;
+}
+#else
+abstract PropOptions(Dynamic) {
+    function new(x: Dynamic) {
+        this = x;
     }
->
+
+    // NOTE can not compile "var type: ValueOfArray<PropType>;" on Haxe 3.4.7
+    @:from
+    public static inline function from1(x: {
+        @:optional var type: PropType;
+        @:optional var required: Bool;
+        @:optional var validator: Dynamic -> Bool;
+        @:optional var defaultValue: Dynamic;
+    }) {
+        Reflect.setField(x, "default", x.defaultValue);
+        return new PropOptions(x);
+    }
+
+    @:from
+    public static inline function from2(x: {
+        @:optional var type: Array<PropType>;
+        @:optional var required: Bool;
+        @:optional var validator: Dynamic -> Bool;
+        @:optional var defaultValue: Dynamic;
+    }) {
+        Reflect.setField(x, "default", x.defaultValue);
+        return new PropOptions(x);
+    }
+}
+#end
 
 abstract PropType(Function) {
     public static var String(get, never): PropType;
@@ -559,11 +576,11 @@ abstract Component(Dynamic)
     }
 
     @:from
-    public static function fromVueHxComponent(x: VueHxComponent) {
+    public static function fromVuehxComponent(x: VuehxComponent) {
         return new Component(x.options);
     }
 }
 
-typedef VueHxComponent = {
-    var options: ComponentOptions<Dynamic>;
+typedef VuehxComponent = {
+    var options(default, null): ComponentOptions<Dynamic>;
 }

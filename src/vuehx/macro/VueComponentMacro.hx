@@ -228,7 +228,6 @@ class VueComponentMacro {
                     sub: "ComponentOptions",
                     params: [ TypeParam.TPType(datatype) ]
                 }),
-                //macro :vuehx.Vue.ComponentOptions<Dynamic>,
                 {expr: EObjectDecl(fields), pos: pos})
         };
     }
