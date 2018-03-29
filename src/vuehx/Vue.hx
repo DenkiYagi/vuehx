@@ -9,7 +9,6 @@ import externtype.Mixed2;
 import externtype.Mixed3;
 import externtype.ValueOrArray;
 import externtype.ValueOrFunction;
-import vuehx.VueRouter;
 
 @:native("Vue")
 extern class Vue<TData> implements Dynamic {
@@ -153,7 +152,7 @@ extern class Vue<TData> implements Dynamic {
      */
     @:native("$style") var style(default, never): Dynamic<String>;
 
-    // vue router
+    // VueRouter
     /**
      * @see https://router.vuejs.org/en/essentials/getting-started.html
      */
@@ -163,7 +162,13 @@ extern class Vue<TData> implements Dynamic {
      * @see https://router.vuejs.org/en/essentials/getting-started.html
      * @see https://router.vuejs.org/en/api/route-object.html
      */
-    @:native("$route") var route(default, never): Route;
+    @:native("$route") var route(default, never): VueRouter.Route;
+
+    // Vuex
+    /**
+     * @see https://vuex.vuejs.org/en/state.html
+     */
+    @:native("$store") var store(default, never): Vuex.Store;
 
     // static
     /**
@@ -228,9 +233,11 @@ extern class Vue<TData> implements Dynamic {
     static var version(default, never): String;
 }
 
-typedef VueOptions<TData> = {
-    > ComponentOptions<TData>,
+typedef VueOptions<TData> = {>ComponentOptions<TData>,
+    // VueRouter
     @:optional var router: VueRouter;
+    // Vuex
+    @:optional var store: Vuex.Store;
 }
 
 typedef ComponentOptions<TData> = {
@@ -559,10 +566,6 @@ typedef WatchOptions = {
 
 typedef Unwatch = Void -> Void;
 
-@:autoBuild(vuehx.macro.VueComponentMacro.build())
-interface IVueComponent {
-}
-
 abstract Component(Dynamic)
     from Class<Vue<Dynamic>>
     from ComponentOptions<Dynamic>
@@ -578,6 +581,10 @@ abstract Component(Dynamic)
     public static function fromVuehxComponent(x: VuehxComponent) {
         return new Component(x.options);
     }
+}
+
+@:autoBuild(vuehx.macro.VueComponentMacro.build())
+interface IVueComponent {
 }
 
 typedef VuehxComponent = {
