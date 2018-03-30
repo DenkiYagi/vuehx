@@ -209,7 +209,7 @@ extern class Vue<TData> implements Dynamic {
     /**
      * @see https://vuejs.org/v2/api/#Vue-use
      **/
-    static function use(plugin: Dynamic, ?options: Dynamic): Void;
+    static function use(plugin: Plugin, ?options: Dynamic): Void;
 
     /**
      * @see https://vuejs.org/v2/api/#Vue-mixin
@@ -230,6 +230,73 @@ extern class Vue<TData> implements Dynamic {
 typedef VueOptions<TData> = {>ComponentOptions<TData>,
     // VueRouter
     @:optional var router: VueRouter;
+}
+
+typedef Plugin = {
+    function install(vue: VueStatic, ?options: Dynamic): Void;
+}
+
+extern class VueStatic implements Dynamic {
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-extend
+     */
+    function extend(options: Mixed2<Class<Vue<Dynamic>>, ComponentOptions<Dynamic>>): Class<Vue<Dynamic>>;
+
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-nextTick
+     */
+    @:overload(function(callback: Void -> Void, ?context: {}): Void {})
+    function nextTick(): Promise<Void>;
+
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-set
+     */
+    @:overload(function<T>(target: Array<T>, key: Int, value: T): Void {})
+    function set(target: {}, key: String, value: Dynamic): Void;
+
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-delete
+     */
+    @:overload(function<T>(target: Array<T>, key: Int): Void {})
+    function delete(target: {}, key: String): Void;
+
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-directive
+     */
+    @:overload(function(id: String, definition: ValueOrFunction<DirectiveOptions>): DirectiveOptions {})
+    function directive(id: String): DirectiveOptions;
+
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-filter
+     */
+    @:overload(function(id: String, definition: Filter): Filter {})
+    function filter(id: String): Filter;
+
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-component
+     */
+    @:overload(function(id: String, definition: Component): Class<Vue<Dynamic>> {})
+    function component(id: String): Class<Vue<Dynamic>>;
+
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-use
+     **/
+    function use(plugin: Plugin, ?options: Dynamic): Void;
+
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-mixin
+     */
+    function mixin(mixin: VueOptions<Dynamic>): Void;
+
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-compile
+     */
+    function compile(template: String): RenderFunctions;
+
+    /**
+     * @see https://vuejs.org/v2/api/#Vue-version
+     */
+    var version(default, never): String;
 }
 
 typedef ComponentOptions<TData> = {
