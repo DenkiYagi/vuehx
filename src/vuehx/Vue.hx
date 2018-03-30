@@ -164,12 +164,6 @@ extern class Vue<TData> implements Dynamic {
      */
     @:native("$route") var route(default, never): VueRouter.Route;
 
-    // Vuex
-    /**
-     * @see https://vuex.vuejs.org/en/state.html
-     */
-    @:native("$store") var store(default, never): Vuex.Store;
-
     // static
     /**
      * @see https://vuejs.org/v2/api/#Vue-extend
@@ -236,8 +230,6 @@ extern class Vue<TData> implements Dynamic {
 typedef VueOptions<TData> = {>ComponentOptions<TData>,
     // VueRouter
     @:optional var router: VueRouter;
-    // Vuex
-    @:optional var store: Vuex.Store;
 }
 
 typedef ComponentOptions<TData> = {
