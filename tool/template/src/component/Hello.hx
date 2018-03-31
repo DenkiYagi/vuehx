@@ -2,6 +2,6 @@ package component;
 
 import vuehx.Vue;
 
-class Hello {
+class Hello implements IVueComponent {
 
 }
