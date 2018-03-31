@@ -2,7 +2,6 @@
     "files.trimTrailingWhitespace": true,
     "editor.insertSpaces": true,
     "haxe.displayConfigurations": [
-        ["test.hxml"],
-        ["tool/run.hxml"]
+        ["complete.hxml"]
     ]
 }

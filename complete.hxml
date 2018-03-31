@@ -1,0 +1,9 @@
+-cp src
+-lib hxgnd
+-lib externtype
+-main Test
+-js build/dummy.js
+-D js-es5
+-debug
+--no-inline
+--no-output
