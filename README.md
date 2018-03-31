@@ -14,7 +14,7 @@ This product is alpha version.
 * npm or yarn
 
 ## Creating a new vuehx project
-1. Create a project directory:
+1. Create a project directory.
 
     ```
     mkdir MyProject
