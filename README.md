@@ -1,4 +1,4 @@
-# vue.hx
+# vuehx
 Haxe extern for Vue.js.
 This product is alpha version.
 
@@ -13,7 +13,7 @@ This product is alpha version.
 * Node.js v8+
 * npm or yarn
 
-## Creating a new vue.hx project
+## Creating a new vuehx project
 1. Create a project directory:
 
     ```
@@ -48,7 +48,7 @@ This product is alpha version.
 
 5. Open `www/index.html` in browser.
 
-## Updating vue.hx
+## Updating vuehx
 ```
 haxelib update
 ```
