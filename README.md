@@ -40,6 +40,14 @@ This product is alpha version.
     haxelib run vuehx setup-yarn
     ```
 
+4.  Build this project.
+
+    ```
+    haxe build.hxml
+    ```
+
+5. Open `www/index.html` in browser.
+
 ## Updating vue.hx
 ```
 haxelib update
