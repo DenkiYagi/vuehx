@@ -1,9 +1,12 @@
 -cp src
+-cp test
 -lib hxgnd
 -lib externtype
+-lib buddy
 -main Test
 -js build/dummy.js
 -D js-es5
+-D noEmbedSetImmediate
 -debug
 --no-inline
 --no-output
