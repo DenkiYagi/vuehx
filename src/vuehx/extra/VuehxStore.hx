@@ -3,24 +3,34 @@ package vuehx.extra;
 import hxgnd.Unit;
 import hxgnd.Future;
 import hxgnd.LangTools;
+import externtype.ValueOrArray;
 
 class VuehxStore<TState, TAction> {
     var currentState: TState;
-    var processor: Processor<TState, TAction>;
     var subscribers: Array<Subscriber<TState>>;
+    var middlewares: Array<Middleware<TState, TAction>>;
 
-    public function new(initState: TState, processor: Processor<TState, TAction>) {
+    public function new(initState: TState, middlewares: ValueOrArray<Middleware<TState, TAction>>) {
         this.currentState = #if debug LangTools.freeze(initState) #else initState #end;
-        this.processor = processor;
         this.subscribers = [];
+        this.middlewares = middlewares.toArray().copy();
     }
 
     public function dispatch(action: TAction): Future<Unit> {
-        return processor({
-            state: currentState,
-            action: action,
-            commit: commit,
-        });
+        var i = 0;
+        var len = middlewares.length;
+        function next() {
+            return if (i < len) {
+                middlewares[i++]({
+                    state: currentState,
+                    action: action,
+                    commit: commit,
+                }, next);
+            } else {
+                Future.successfulUnit();
+            }
+        }
+        return next();
     }
 
     function commit(reducer: TState -> TState): Void {
@@ -40,7 +50,8 @@ class VuehxStore<TState, TAction> {
     }
 }
 
-typedef Processor<TState, TAction> = Context<TState, TAction> -> Future<Unit>;
+typedef Middleware<TState, TAction> = Context<TState, TAction> -> Next -> Future<Unit>;
+typedef Next = Void -> Future<Unit>;
 
 typedef Context<TState, TAction> = {
     var state(default, null): TState;
