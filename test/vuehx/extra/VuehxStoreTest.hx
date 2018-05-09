@@ -33,7 +33,7 @@ class VuehxStoreTest extends BuddySuite {
             describe("Single middleware", {
                 it("should call", function (done) {
                     var called = false;
-                    var store = new VuehxStore(0, function (ctx, next) {
+                    var store = new VuehxStore(0, function (ctx) {
                         called = true;
                         ctx.commit(function (state) return state);
                         return Future.successfulUnit();
@@ -47,7 +47,7 @@ class VuehxStoreTest extends BuddySuite {
 
                 it("should call 2-times", function (done) {
                     var called = 0;
-                    var store = new VuehxStore(0, function (ctx, next) {
+                    var store = new VuehxStore(0, function (ctx) {
                         called++;
                         return Future.successfulUnit();
                     });
@@ -61,8 +61,8 @@ class VuehxStoreTest extends BuddySuite {
                 });
 
                 it("should not notify when it call next", function (done) {
-                    var store = new VuehxStore(0, function (ctx, next) {
-                        return next();
+                    var store = new VuehxStore(0, function (ctx) {
+                        return ctx.next();
                     });
                     store.subscribe(function (x) {
                         fail();
@@ -73,7 +73,7 @@ class VuehxStoreTest extends BuddySuite {
                 });
 
                 it("should not notify when it has given same state", function (done) {
-                    var store = new VuehxStore({data: 1}, function (ctx, next) {
+                    var store = new VuehxStore({data: 1}, function (ctx) {
                         ctx.commit(function (state) return {data: 1});
                         return Future.successfulUnit();
                     });
@@ -86,7 +86,7 @@ class VuehxStoreTest extends BuddySuite {
                 });
 
                 it("should notify when it has given different state", function (done) {
-                    var store = new VuehxStore({data: 1}, function (ctx, next) {
+                    var store = new VuehxStore({data: 1}, function (ctx) {
                         ctx.commit(function (state) return {data: 2});
                         return Future.successfulUnit();
                     });
@@ -98,7 +98,7 @@ class VuehxStoreTest extends BuddySuite {
                 });
 
                 it("should notify 2-times", function (done) {
-                    var store = new VuehxStore(0, function (ctx, next) {
+                    var store = new VuehxStore(0, function (ctx) {
                         ctx.commit(function (state) return state + 1);
                         return Future.successfulUnit();
                     });
@@ -124,7 +124,7 @@ class VuehxStoreTest extends BuddySuite {
                 });
 
                 it("should notify 2-subscribers", function (done) {
-                    var store = new VuehxStore(0, function (ctx, next) {
+                    var store = new VuehxStore(0, function (ctx) {
                         ctx.commit(function (state) return state + 1);
                         return Future.successfulUnit();
                     });
@@ -150,7 +150,7 @@ class VuehxStoreTest extends BuddySuite {
 
                 describe("returned Future", {
                     it("should not be active", {
-                        var store = new VuehxStore({data: 1}, function (ctx, next) {
+                        var store = new VuehxStore({data: 1}, function (ctx) {
                             return Future.successfulUnit();
                         });
                         var future = store.dispatch(Increment);
@@ -158,7 +158,7 @@ class VuehxStoreTest extends BuddySuite {
                     });
 
                     it("should abort with Future", function (done) {
-                        var store = new VuehxStore({data: 1}, function (ctx, next) {
+                        var store = new VuehxStore({data: 1}, function (ctx) {
                             return Future.applySync(function (ctx) {
                                 ctx.onAbort = function () {
                                     done();
@@ -170,7 +170,7 @@ class VuehxStoreTest extends BuddySuite {
                     });
 
                     it("should abort with Stream", function (done) {
-                        var store = new VuehxStore({data: 1}, function (_, next) {
+                        var store = new VuehxStore({data: 1}, function (_) {
                             return Stream.apply(function (ctx) {
                                 ctx.onAbort = function () {
                                     done();
@@ -190,11 +190,11 @@ class VuehxStoreTest extends BuddySuite {
                 it("should call only 1st middleware", function (done) {
                     var called = false;
                     var store = new VuehxStore(0, [
-                        function (ctx, next) {
+                        function (ctx) {
                             called = true;
                             return Future.successfulUnit();
                         },
-                        function (ctx, next) {
+                        function (ctx) {
                             fail();
                             return Future.successfulUnit();
                         }
@@ -210,11 +210,11 @@ class VuehxStoreTest extends BuddySuite {
                     var called1 = false;
                     var called2 = false;
                     var store = new VuehxStore(0, [
-                        function (ctx, next) {
+                        function (ctx) {
                             called1 = true;
-                            return next();
+                            return ctx.next();
                         },
-                        function (ctx, next) {
+                        function (ctx) {
                             called2 = true;
                             return Future.successfulUnit();
                         }
@@ -229,13 +229,13 @@ class VuehxStoreTest extends BuddySuite {
 
                 it("should not commit when it already completed", function (done) {
                     var store = new VuehxStore(0, [
-                        function (ctx, next) {
+                        function (ctx) {
                             Timer.delay(function () {
                                 ctx.commit(function (x) return 1);
                             }, 5);
-                            return next();
+                            return ctx.next();
                         },
-                        function (ctx, next) {
+                        function (ctx) {
                             ctx.commit(function (x) return 2);
                             return Future.successfulUnit();
                         }
@@ -252,7 +252,7 @@ class VuehxStoreTest extends BuddySuite {
 
         describe("VuehxStore.unsubscribe()", {
             it("should pass", {
-                var store = new VuehxStore(0, function (ctx, next) {
+                var store = new VuehxStore(0, function (ctx) {
                     ctx.commit(function (state) return state + 1);
                     return Future.successfulUnit();
                 });

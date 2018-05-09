@@ -39,7 +39,8 @@ class VuehxStore<TState, TAction> {
                     state: state,
                     action: action,
                     commit: commit,
-                }, next);
+                    next: next,
+                });
                 future.then(function (_) {
                     completed = true;
                 });
@@ -60,13 +61,13 @@ class VuehxStore<TState, TAction> {
     }
 }
 
-typedef Middleware<TState, TAction> = Context<TState, TAction> -> Next -> Future<Unit>;
-typedef Next = Void -> Future<Unit>;
+typedef Middleware<TState, TAction> = Context<TState, TAction> -> Future<Unit>;
 
 typedef Context<TState, TAction> = {
     var state(default, null): TState;
     var action(default, null): TAction;
     function commit(reducer: TState -> TState): Void;
+    function next(): Future<Unit>;
 }
 
 typedef Subscriber<TState> = TState -> Void;
