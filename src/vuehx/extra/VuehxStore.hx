@@ -26,7 +26,7 @@ class VuehxStore<TState, TAction> {
     function commit(reducer: TState -> TState): Void {
         var newState = reducer(state);
         if (LangTools.notSame(state, newState)) {
-            state = #if debug LangTools.freeze(newState) #else state #end;
+            state = #if debug LangTools.freeze(newState) #else newState #end;
             for (f in subscribers) f(state);
         }
     }
