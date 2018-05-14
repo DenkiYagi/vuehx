@@ -6,17 +6,17 @@ import hxgnd.LangTools;
 
 class VuehxModel<TState, TAction> {
     public var state(default, null): TState;
-    var hanlder: ActionHanlder<TState, TAction>;
+    var processor: Processor<TState, TAction>;
     var subscribers: Array<Subscriber<TState>>;
 
-    public function new(initState: TState, hanlder: ActionHanlder<TState, TAction>) {
+    public function new(initState: TState, middleware: Middleware<TState, TAction>) {
         this.state = #if debug LangTools.freeze(initState) #else initState #end;
-        this.hanlder = hanlder;
+        this.processor = middleware;
         this.subscribers = [];
     }
 
     public function dispatch(action: TAction): Future<Unit> {
-        return hanlder({
+        return processor({
             state: state,
             update: update,
         }, action);
@@ -39,11 +39,24 @@ class VuehxModel<TState, TAction> {
     }
 }
 
-typedef ActionHanlder<TState, TAction> = Context<TState> -> TAction -> Future<Unit>;
-
 typedef Context<TState> = {
     var state(default, null): TState;
     function update(reducer: TState -> TState): Void;
 }
 
 typedef Subscriber<TState> = TState -> Void;
+
+private typedef Processor<TState, TAction> = Context<TState> -> TAction -> Future<Unit>;
+
+abstract Middleware<TState, TAction>(Processor<TState, TAction>)
+    from Processor<TState, TAction> to Processor<TState, TAction>
+{
+    inline function new(x: Processor<TState, TAction>) {
+        this = x;
+    }
+
+    @:from
+    public static inline function from<TState, TAction>(obj: { process: Processor<TState, TAction> }) {
+        return new Middleware(obj.process);
+    }
+}
