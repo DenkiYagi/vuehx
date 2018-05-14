@@ -4,26 +4,25 @@ import hxgnd.Unit;
 import hxgnd.Future;
 import hxgnd.LangTools;
 
-class VuehxStore<TState, TAction> {
+class VuehxModel<TAction, TState> {
     public var state(default, null): TState;
+    var hanlder: ActionHanlder<TAction, TState>;
     var subscribers: Array<Subscriber<TState>>;
-    var middleware: Middleware<TState, TAction>;
 
-    public function new(initState: TState, middleware: Middleware<TState, TAction>) {
+    public function new(hanlder: ActionHanlder<TAction, TState>, initState: TState) {
         this.state = #if debug LangTools.freeze(initState) #else initState #end;
+        this.hanlder = hanlder;
         this.subscribers = [];
-        this.middleware = middleware;
     }
 
     public function dispatch(action: TAction): Future<Unit> {
-        return middleware({
+        return hanlder(action, {
             state: state,
-            action: action,
-            commit: commit,
+            update: update,
         });
     }
 
-    function commit(reducer: TState -> TState): Void {
+    function update(reducer: TState -> TState): Void {
         var newState = reducer(state);
         if (LangTools.notSame(state, newState)) {
             state = #if debug LangTools.freeze(newState) #else newState #end;
@@ -40,12 +39,11 @@ class VuehxStore<TState, TAction> {
     }
 }
 
-typedef Middleware<TState, TAction> = Context<TState, TAction> -> Future<Unit>;
+typedef ActionHanlder<TAction, TState> = TAction -> Context<TState> -> Future<Unit>;
 
-typedef Context<TState, TAction> = {
+typedef Context<TState> = {
     var state(default, null): TState;
-    var action(default, null): TAction;
-    function commit(reducer: TState -> TState): Void;
+    function update(reducer: TState -> TState): Void;
 }
 
 typedef Subscriber<TState> = TState -> Void;
