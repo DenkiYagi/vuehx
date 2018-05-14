@@ -4,22 +4,22 @@ import hxgnd.Unit;
 import hxgnd.Future;
 import hxgnd.LangTools;
 
-class VuehxModel<TAction, TState> {
+class VuehxModel<TState, TAction> {
     public var state(default, null): TState;
-    var hanlder: ActionHanlder<TAction, TState>;
+    var hanlder: ActionHanlder<TState, TAction>;
     var subscribers: Array<Subscriber<TState>>;
 
-    public function new(hanlder: ActionHanlder<TAction, TState>, initState: TState) {
+    public function new(initState: TState, hanlder: ActionHanlder<TState, TAction>) {
         this.state = #if debug LangTools.freeze(initState) #else initState #end;
         this.hanlder = hanlder;
         this.subscribers = [];
     }
 
     public function dispatch(action: TAction): Future<Unit> {
-        return hanlder(action, {
+        return hanlder({
             state: state,
             update: update,
-        });
+        }, action);
     }
 
     function update(reducer: TState -> TState): Void {
@@ -39,7 +39,7 @@ class VuehxModel<TAction, TState> {
     }
 }
 
-typedef ActionHanlder<TAction, TState> = TAction -> Context<TState> -> Future<Unit>;
+typedef ActionHanlder<TState, TAction> = Context<TState> -> TAction -> Future<Unit>;
 
 typedef Context<TState> = {
     var state(default, null): TState;

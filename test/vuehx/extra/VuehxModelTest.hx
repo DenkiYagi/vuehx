@@ -16,11 +16,11 @@ class VuehxModelTest extends BuddySuite {
 
             it("should call", function (done) {
                 var called = false;
-                var store = new VuehxModel(function (action, ctx) {
+                var store = new VuehxModel(0, function (ctx, action) {
                     called = true;
                     ctx.update(function (state) return state);
                     return Future.successfulUnit();
-                }, 0);
+                });
                 store.dispatch(Increment);
                 Timer.delay(function () {
                     called.should.be(true);
@@ -30,10 +30,10 @@ class VuehxModelTest extends BuddySuite {
 
             it("should call 2-times", function (done) {
                 var called = 0;
-                var store = new VuehxModel(function (action, ctx) {
+                var store = new VuehxModel(0, function (ctx, action) {
                     called++;
                     return Future.successfulUnit();
-                }, 0);
+                });
                 store.dispatch(Increment);
                 store.dispatch(Increment);
 
@@ -44,10 +44,10 @@ class VuehxModelTest extends BuddySuite {
             });
 
             it("should not notify when it has given same state", function (done) {
-                var store = new VuehxModel(function (action, ctx) {
+                var store = new VuehxModel({data: 1}, function (ctx, action) {
                     ctx.update(function (state) return {data: 1});
                     return Future.successfulUnit();
-                }, {data: 1});
+                });
                 store.subscribe(function (x) {
                     fail();
                     done();
@@ -57,10 +57,10 @@ class VuehxModelTest extends BuddySuite {
             });
 
             it("should notify when it has given different state", function (done) {
-                var store = new VuehxModel(function (action, ctx) {
+                var store = new VuehxModel({data: 1}, function (ctx, action) {
                     ctx.update(function (state) return {data: 2});
                     return Future.successfulUnit();
-                }, {data: 1});
+                });
                 store.subscribe(function (x) {
                     x.same({data: 2}).should.be(true);
                     done();
@@ -69,10 +69,10 @@ class VuehxModelTest extends BuddySuite {
             });
 
             it("should notify 2-times", function (done) {
-                var store = new VuehxModel(function (action, ctx) {
+                var store = new VuehxModel(0, function (ctx, action) {
                     ctx.update(function (state) return state + 1);
                     return Future.successfulUnit();
-                }, 0);
+                });
 
                 var count = 0;
                 store.subscribe(function (x) {
@@ -95,10 +95,10 @@ class VuehxModelTest extends BuddySuite {
             });
 
             it("should notify 2-subscribers", function (done) {
-                var store = new VuehxModel(function (action, ctx) {
+                var store = new VuehxModel(0, function (ctx, action) {
                     ctx.update(function (state) return state + 1);
                     return Future.successfulUnit();
-                }, 0);
+                });
 
                 var count1 = 0;
                 store.subscribe(function (x) {
@@ -121,33 +121,33 @@ class VuehxModelTest extends BuddySuite {
 
             describe("returned Future", {
                 it("should not be active", {
-                    var store = new VuehxModel(function (action, ctx) {
+                    var store = new VuehxModel({data: 1}, function (ctx, action) {
                         return Future.successfulUnit();
-                    }, {data: 1});
+                    });
                     var future = store.dispatch(Increment);
                     future.isActive.should.be(false);
                 });
 
                 it("should abort with Future", function (done) {
-                    var store = new VuehxModel(function (action, ctx) {
+                    var store = new VuehxModel({data: 1}, function (ctx, action) {
                         return Future.applySync(function (ctx) {
                             ctx.onAbort = function () {
                                 done();
                             }
                         });
-                    }, {data: 1});
+                    });
                     var future = store.dispatch(Increment);
                     future.abort();
                 });
 
                 it("should abort with Stream", function (done) {
-                    var store = new VuehxModel(function (_, _) {
+                    var store = new VuehxModel({data: 1}, function (_, _) {
                         return Stream.apply(function (ctx) {
                             ctx.onAbort = function () {
                                 done();
                             }
                         }).end;
-                    }, {data: 1});
+                    });
 
                     var future = store.dispatch(Increment);
                     Timer.delay(function () {
@@ -159,10 +159,10 @@ class VuehxModelTest extends BuddySuite {
 
         describe("VuehxModel.unsubscribe()", {
             it("should pass", {
-                var store = new VuehxModel(function (action, ctx) {
+                var store = new VuehxModel(0, function (ctx, action) {
                     ctx.update(function (state) return state + 1);
                     return Future.successfulUnit();
-                }, 0);
+                });
 
                 var count = 0;
                 function subscriber(x) {
