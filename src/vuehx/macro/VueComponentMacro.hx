@@ -3,11 +3,8 @@ package vuehx.macro;
 #if macro
 import sys.FileSystem;
 import sys.io.Process;
-import sys.io.File;
-import sys.io.FileOutput;
 import haxe.Json;
 import haxe.macro.Context;
-import haxe.macro.Compiler;
 import haxe.macro.Type;
 import haxe.macro.Expr;
 import hxgnd.Maybe;
