@@ -4,22 +4,23 @@ import hxgnd.Unit;
 import hxgnd.Future;
 import hxgnd.LangTools;
 
-class VuehxModel<TState, TAction> {
-    public var state(default, null): TState;
-    var processor: Processor<TState, TAction>;
+class VuehxModel<TState, TCommand> {
+    var middleware: MiddlewareFunc<TState, TCommand>;
     var subscribers: Array<Subscriber<TState>>;
 
-    public function new(initState: TState, middleware: Middleware<TState, TAction>) {
-        this.state = #if debug LangTools.freeze(initState) #else initState #end;
-        this.processor = middleware;
+    public var state(default, null): TState;
+
+    public function new(middleware: Middleware<TState, TCommand>, initState: TState) {
+        this.middleware = middleware;
         this.subscribers = [];
+        this.state = #if debug LangTools.freeze(initState) #else initState #end;
     }
 
-    public function dispatch(action: TAction): Future<Unit> {
-        return processor({
+    public function dispatch(message: TCommand): Future<Unit> {
+        return middleware({
             state: state,
             update: update,
-        }, action);
+        }, message);
     }
 
     function update(reducer: TState -> TState): Void {
@@ -46,17 +47,22 @@ typedef Context<TState> = {
 
 typedef Subscriber<TState> = TState -> Void;
 
-private typedef Processor<TState, TAction> = Context<TState> -> TAction -> Future<Unit>;
-
-abstract Middleware<TState, TAction>(Processor<TState, TAction>)
-    from Processor<TState, TAction> to Processor<TState, TAction>
+abstract Middleware<TState, TCommand>(MiddlewareFunc<TState, TCommand>)
+    from MiddlewareFunc<TState, TCommand> to MiddlewareFunc<TState, TCommand>
 {
-    inline function new(x: Processor<TState, TAction>) {
+    inline function new(x: MiddlewareFunc<TState, TCommand>) {
         this = x;
     }
 
     @:from
-    public static inline function from<TState, TAction>(obj: { process: Processor<TState, TAction> }) {
-        return new Middleware(obj.process);
+    public static inline function from1<TState, TCommand>(obj: { call: MiddlewareFunc<TState, TCommand> }) {
+        return new Middleware(obj.call);
+    }
+
+    @:from
+    public static inline function from2<TState, TCommand>(obj: { function call(ctx: Context<TState>, msg: TCommand): Future<Unit>; }) {
+        return new Middleware(obj.call);
     }
 }
+
+private typedef MiddlewareFunc<TState, TCommand> = Context<TState> -> TCommand -> Future<Unit>;
