@@ -1,7 +1,7 @@
 package vuehx.extra;
 
 import hxgnd.Unit;
-import hxgnd.Future;
+import hxgnd.AbortablePromise;
 import hxgnd.LangTools;
 
 class VuehxModel<TState, TCommand> {
@@ -16,7 +16,7 @@ class VuehxModel<TState, TCommand> {
         this.state = #if debug LangTools.freeze(initState) #else initState #end;
     }
 
-    public function dispatch(message: TCommand): Future<Unit> {
+    public function dispatch(message: TCommand): AbortablePromise<Unit> {
         return middleware({
             state: state,
             update: update,
@@ -60,9 +60,9 @@ abstract Middleware<TState, TCommand>(MiddlewareFunc<TState, TCommand>)
     }
 
     @:from
-    public static inline function from2<TState, TCommand>(obj: { function call(ctx: Context<TState>, msg: TCommand): Future<Unit>; }) {
+    public static inline function from2<TState, TCommand>(obj: { function call(ctx: Context<TState>, msg: TCommand): AbortablePromise<Unit>; }) {
         return new Middleware(obj.call);
     }
 }
 
-private typedef MiddlewareFunc<TState, TCommand> = Context<TState> -> TCommand -> Future<Unit>;
+private typedef MiddlewareFunc<TState, TCommand> = Context<TState> -> TCommand -> AbortablePromise<Unit>;
