@@ -5,8 +5,7 @@ import js.Promise;
 import js.html.Element;
 import haxe.Constraints.Function;
 import haxe.extern.Rest;
-import externtype.Mixed2;
-import externtype.Mixed3;
+import externtype.Mixed;
 import externtype.ValueOrArray;
 import externtype.ValueOrFunction;
 
