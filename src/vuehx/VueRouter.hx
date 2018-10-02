@@ -1,9 +1,7 @@
 package vuehx;
 
 import vuehx.Vue;
-import externtype.Mixed.Mixed2;
-import externtype.Mixed.Mixed3;
-import externtype.Mixed.Mixed4;
+import externtype.Mixed;
 import externtype.ValueOrArray;
 import haxe.Constraints.Function;
 
