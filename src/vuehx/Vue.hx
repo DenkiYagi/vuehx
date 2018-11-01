@@ -5,9 +5,9 @@ import js.Promise;
 import js.html.Element;
 import haxe.Constraints.Function;
 import haxe.extern.Rest;
-import externtype.Mixed;
-import externtype.ValueOrArray;
-import externtype.ValueOrFunction;
+import extype.extern.Mixed;
+import extype.extern.ValueOrArray;
+import extype.extern.ValueOrFunction;
 
 @:native("Vue")
 extern class Vue<TData> implements Dynamic {
