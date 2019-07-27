@@ -125,7 +125,7 @@ typedef Location = {
 }
 typedef RawLocation = Mixed2<String, Location>;
 
-typedef NavigationGuard = Route -> Route -> (?Mixed4<Bool, RawLocation, Vue<Dynamic> -> Void, js.Error> -> Void) -> Void;
+typedef NavigationGuard = Route -> Route -> (?Mixed4<Bool, RawLocation, Vue<Dynamic> -> Void, js.lib.Error> -> Void) -> Void;
 
 typedef RedirectOption = Mixed2<RawLocation, Location -> RawLocation>;
 
@@ -157,7 +157,7 @@ typedef Route = {
 
 typedef RouteRecord = {
     var path(default, never): String;
-    var regex: js.RegExp;
+    var regex: js.lib.RegExp;
     var components: Dynamic<Component>;
     var instances: Dynamic<Vue<Dynamic>>;
     @:optional var name: String;
