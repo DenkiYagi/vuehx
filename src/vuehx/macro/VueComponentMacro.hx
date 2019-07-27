@@ -10,7 +10,7 @@ import haxe.macro.Context;
 import haxe.macro.Compiler;
 import haxe.macro.Type;
 import haxe.macro.Expr;
-import hxgnd.Maybe;
+import extype.Maybe;
 import haxe.Http;
 
 using hxgnd.ArrayTools;

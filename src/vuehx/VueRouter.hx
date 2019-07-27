@@ -1,11 +1,9 @@
 package vuehx;
 
 import vuehx.Vue;
-import externtype.Mixed2;
-import externtype.Mixed3;
-import externtype.Mixed4;
-import externtype.ValueOrArray;
 import haxe.Constraints.Function;
+import extype.extern.Mixed;
+import extype.extern.ValueOrArray;
 
 /**
  * @see https://router.vuejs.org/en/api/router-instance.html

@@ -34,7 +34,7 @@ class Run {
     }
 
     static function printUsage() {
-        Sys.println("usage: haxelib run hxgnd <command>");
+        Sys.println("usage: haxelib run vuehx <command>");
         Sys.println("  setup        setup with npm");
         Sys.println("  setup-yarn   setup with yarn");
     }

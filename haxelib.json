@@ -9,7 +9,7 @@
     "releasenote": "Initial release.",
     "contributors": ["terurou"],
     "dependencies": {
-      "externtype": "",
+      "extype": "",
       "hxgnd": "git:git@github.com:DenkiYagi/hxgnd.git"
     }
 }
