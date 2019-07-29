@@ -1,7 +1,7 @@
 package vuehx;
 
-import js.Error;
-import js.Promise;
+import js.lib.Error;
+import js.lib.Promise;
 import js.html.Element;
 import haxe.Constraints.Function;
 import haxe.extern.Rest;
